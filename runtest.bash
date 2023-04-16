@@ -77,6 +77,24 @@ diff perfaware/part1/listing_0050_challenge_jumps test/test_0050
 
 test/sim8086 exec perfaware/part1/listing_0050_challenge_jumps
 
+test/sim8086 decode perfaware/part1/listing_0051_memory_mov > test/test_0051.asm
+nasm test/test_0051.asm
+diff perfaware/part1/listing_0051_memory_mov test/test_0051
+
+test/sim8086 exec perfaware/part1/listing_0051_memory_mov
+
+test/sim8086 decode perfaware/part1/listing_0052_memory_add_loop > test/test_0052.asm
+nasm test/test_0052.asm
+diff perfaware/part1/listing_0052_memory_add_loop test/test_0052
+
+test/sim8086 exec perfaware/part1/listing_0052_memory_add_loop
+
+test/sim8086 decode perfaware/part1/listing_0053_add_loop_challenge > test/test_0053.asm
+nasm test/test_0053.asm
+diff perfaware/part1/listing_0053_add_loop_challenge test/test_0053
+
+test/sim8086 exec perfaware/part1/listing_0053_add_loop_challenge
+
 #test/sim8086 data/test > test/test.asm
 #nasm test/test.asm
 #diff data/test test/test

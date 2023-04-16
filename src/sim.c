@@ -66,6 +66,12 @@ void *operand(Instruction *inst, u8 pos)
     return &registers.ds;
   case OPERAND_JMP_8:
     return &inst->op[pos].data_lo;
+  case OPERAND_MEM16_D16:
+    return memory + (((u16)inst->op[pos].data_hi) << 8 | ((u16)inst->op[pos].data_lo));
+  case OPERAND_MEM16_BX_D8:
+    return memory + (registers.bx + (u16)inst->op[pos].data_lo);
+  case OPERAND_MEM16_BP_SI:
+    return  memory + (registers.bp + registers.si);
   }
   printf("Operand unk = '0x%X'\n", inst->op[pos].type);
   exit(-1);
@@ -88,7 +94,10 @@ void exec8(Instruction *inst)
   {
     case OPERATOR_MOV:
     {
-      printf("%s(0x%hX)->", OPERAND_REG[inst->op[LEFT].type], org_dest);
+      if(isMem(inst->op[LEFT].type))
+        printf("MEM(0x%hX)->", org_dest);
+      else
+        printf("%s(0x%hX)->", OPERAND_REG[inst->op[LEFT].type], org_dest);
       memcpy(dest, src, 1);
       printf("(0x%hX) ", *dest);
       print_ip();
@@ -221,7 +230,10 @@ void exec16(Instruction *inst)
   {
     case OPERATOR_MOV:
     {
-      printf("%s(0x%hX)->", OPERAND_REG[inst->op[LEFT].type], org_dest);
+      if(isMem(inst->op[LEFT].type))
+        printf("MEM(0x%hX)->", org_dest);
+      else
+        printf("%s(0x%hX)->", OPERAND_REG[inst->op[LEFT].type], org_dest);
       memcpy(dest, src, 2);
       printf("(0x%hX) ", *dest);
       print_ip();
