@@ -48,22 +48,39 @@ bool getParity(u8 n)
 
 int main(int argc, char **argv)
 {
-  if(argc != 3)
+  if(argc < 3)
   {
-    printf("Invalid number of args, use sim8086 <mode> <filename>\n");
+    printf("Invalid number of args, use sim8086 <modes> <filename>\n");
     return -1;
   }
 
-  FILE * file = fopen(argv[2], "r");
+  FILE * file = fopen(argv[(argc - 1)], "r");
   assert(file);
       
   const size_t rsize = fread(ip, 1, 1024 * 1024, file);
   ip_end = &ip[rsize];
   fclose(file);
 
-  if(strcmp(argv[1], "exec") == 0)
-  	exec_all(argv[2]);
-  else
-	  print_all(argv[2]);
+  for(i32 i = 1; i < (argc - 1); i++)
+  {
+    if(strcmp(argv[i], "exec") == 0)
+    	exec_all(argv[argc - 1]);
+    else if(strcmp(argv[i], "decode") == 0)
+  	  print_all(argv[argc - 1]);
+  }
+
+  for(i32 i = 1; i < (argc - 1); i++)
+  {
+    if(strcmp(argv[i], "dump") == 0)
+    {
+      file = fopen("sim_memory.data", "w");
+      if(file)
+      {
+        fwrite(memory, 1, 1024*1024, file);
+        fclose(file);
+      }
+    }
+  }
+  
   return 0;
 }

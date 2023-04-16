@@ -68,10 +68,19 @@ void *operand(Instruction *inst, u8 pos)
     return &inst->op[pos].data_lo;
   case OPERAND_MEM16_D16:
     return memory + (((u16)inst->op[pos].data_hi) << 8 | ((u16)inst->op[pos].data_lo));
+  case OPERAND_MEM8_BX_D8:
   case OPERAND_MEM16_BX_D8:
     return memory + (registers.bx + (u16)inst->op[pos].data_lo);
+  case OPERAND_MEM8_BX_D16:
+    return memory + registers.bx + (((u16)inst->op[pos].data_hi) << 8 | ((u16)inst->op[pos].data_lo));
   case OPERAND_MEM16_BP_SI:
     return  memory + (registers.bp + registers.si);
+  case OPERAND_MEM8_BP_D8:
+  case OPERAND_MEM16_BP_D8:
+    return  memory + (registers.bp + (u16)inst->op[pos].data_lo);
+  case OPERAND_MEM8_BP_D16:
+    return memory + registers.bp + (((u16)inst->op[pos].data_hi) << 8 | ((u16)inst->op[pos].data_lo));
+  
   }
   printf("Operand unk = '0x%X'\n", inst->op[pos].type);
   exit(-1);
@@ -200,6 +209,16 @@ void exec8(Instruction *inst)
       break;
     }
     case OPERATOR_LOOPNZ:
+    {
+      printf("CX(0x%hX)->", registers.cx);
+      if(--registers.cx)
+        ip += org_dest;
+      printf("(0x%hX) ", registers.cx);
+      print_ip();
+      printf("\n");
+      break;
+    }
+    case OPERATOR_LOOP:
     {
       printf("CX(0x%hX)->", registers.cx);
       if(--registers.cx)

@@ -95,6 +95,18 @@ diff perfaware/part1/listing_0053_add_loop_challenge test/test_0053
 
 test/sim8086 exec perfaware/part1/listing_0053_add_loop_challenge
 
+test/sim8086 decode perfaware/part1/listing_0054_draw_rectangle > test/test_0054.asm
+nasm test/test_0054.asm
+diff perfaware/part1/listing_0054_draw_rectangle test/test_0054
+
+test/sim8086 exec perfaware/part1/listing_0054_draw_rectangle
+
+test/sim8086 decode perfaware/part1/listing_0055_challenge_rectangle > test/test_0055.asm
+nasm test/test_0055.asm
+diff perfaware/part1/listing_0055_challenge_rectangle test/test_0055
+
+test/sim8086 exec dump perfaware/part1/listing_0055_challenge_rectangle
+
 #test/sim8086 data/test > test/test.asm
 #nasm test/test.asm
 #diff data/test test/test
