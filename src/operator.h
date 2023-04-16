@@ -107,9 +107,12 @@
 #define OPERATOR_SS     0x65
 #define OPERATOR_DS     0x66
 #define OPERATOR_INT3   0x67
+#define OPERATOR_RETF   0x68
+#define OPERATOR_CALLF  0x69
+#define OPERATOR_JMPF   0x6A
 
 
-const char * MNEMONIC[0x68] = 
+const char * MNEMONIC[0x6B] = 
 {
     "UNK","AAA","AAD","AAM","AAS","ADC","ADD","AND","CALL","CBW","CLC","CLD",
     "CLI","CMC","CMP","CMPSB","CMPSW","CWD","DAA","DAS","DEC","DIV","ESC",
@@ -120,7 +123,7 @@ const char * MNEMONIC[0x68] =
     "OR","OUT","POP","POPF","PUSH","PUSHF","RCL","RCR","REP","REPNE","RET",
     "ROL","ROR","SAHF","SAL","SAR","SBB","SCASB","SCASW","SHR","STC","STD",
     "STI","STOSB","STOSW","SUB","TEST","WAIT","XCHG","XLAT","XOR","ES",
-    "CS","SS","DS","INT3"
+    "CS","SS","DS","INT3","RETF","CALL FAR", "JMP FAR"
 };
 
 bool isSegment(u8 opcode)

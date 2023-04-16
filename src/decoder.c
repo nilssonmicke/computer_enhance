@@ -89,6 +89,7 @@ void DataDisp(Instruction *inst, u8 pos)
 Instruction decode()
 {
   u8 opcode = read_8();
+  //printf(";%s\n", BinaryString[opcode]);
   Instruction inst = {0};
   switch (opcode)
   {
@@ -966,11 +967,10 @@ Instruction decode()
     inst.op[RIGHT].type = OPERAND_NONE;
     break;
   case BIN(10011010):
-    // TODO: add new operands ?
     inst.mnemonic = OPERATOR_CALL;
-    inst.op[LEFT].type = OPERAND_MEM8_D16;
-    inst.op[RIGHT].type = OPERAND_MEM8_D16;
-    DataDisp(&inst, RIGHT);
+    inst.op[LEFT].type = OPERAND_SEG_16;
+    inst.op[RIGHT].type = OPERAND_IMMED_16;
+    DataDisp(&inst, RIGHT);    
     DataDisp(&inst, LEFT);
     break;
   case BIN(10011011):
@@ -1246,13 +1246,13 @@ Instruction decode()
     inst.mnemonic = OPERATOR_UNK;
     break;
   case BIN(11001010):
-    inst.mnemonic = OPERATOR_RET;
+    inst.mnemonic = OPERATOR_RETF;
     inst.op[LEFT].type = OPERAND_IMMED_16;
     inst.op[RIGHT].type = OPERAND_NONE;
     DataDisp(&inst, LEFT);
     break;
   case BIN(11001011):
-    inst.mnemonic = OPERATOR_RET;
+    inst.mnemonic = OPERATOR_RETF;
     inst.op[LEFT].type = OPERAND_NONE;
     inst.op[RIGHT].type = OPERAND_NONE;
     break;
@@ -1542,10 +1542,10 @@ Instruction decode()
     DataDisp(&inst, LEFT);
     break;
   case BIN(11101010):
-    // TODO: Read CS-LO,CS-HI in bytes 4 and 5
     inst.mnemonic = OPERATOR_JMP;
-    inst.op[LEFT].type = OPERAND_JMP_16;
-    inst.op[RIGHT].type = OPERAND_NONE;
+    inst.op[LEFT].type = OPERAND_SEG_16;
+    inst.op[RIGHT].type = OPERAND_IMMED_16;
+    DataDisp(&inst, RIGHT);
     DataDisp(&inst, LEFT);
     break;
   case BIN(11101011):
@@ -1577,6 +1577,13 @@ Instruction decode()
   case BIN(11110000):
     inst = decode();
     inst.attributes |= LOCK_ATTR;
+    if(inst.mnemonic == OPERATOR_XCHG)
+    {
+      Instruction tmp = {0};
+      memcpy(&tmp.op[0], &inst.op[0], 3);
+      memcpy(&inst.op[0], &inst.op[1], 3);     
+      memcpy(&inst.op[1], &tmp.op[0], 3);     
+    }
     break;
   case BIN(11110001):
     inst.mnemonic = OPERATOR_UNK;
@@ -1757,13 +1764,13 @@ Instruction decode()
       inst.mnemonic = OPERATOR_CALL;
       break;
     case BIN(00000011):
-      inst.mnemonic = OPERATOR_CALL;
+      inst.mnemonic = OPERATOR_CALLF;
       break;
     case BIN(00000100):
       inst.mnemonic = OPERATOR_JMP;
       break;
     case BIN(00000101):
-      inst.mnemonic = OPERATOR_JMP;
+      inst.mnemonic = OPERATOR_JMPF;
       break;
     case BIN(00000110):
       inst.mnemonic = OPERATOR_PUSH;

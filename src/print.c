@@ -47,46 +47,55 @@ void print(Instruction inst)
     {
       i8 disp = inst.op[LEFT].data_lo;
       if ((inst.op[LEFT].type == OPERAND_MEM16_D8 || inst.op[LEFT].type == OPERAND_MEM8_D8) && disp > 0)
-        printf("%d", disp);
+        printf("%hd", disp);
       else if (disp > 0)
-        printf(" + %d", disp);
+        printf(" + %hd", disp);
       else if (disp < 0)
-        printf(" - %d", -disp);
+        printf(" - %hd", -disp);
     }
     else if (has16bitDisp(inst.op[LEFT].type))
     {
       i16 disp = ((i16)inst.op[LEFT].data_hi) << 8 | ((i16)inst.op[LEFT].data_lo);
       if ((inst.op[LEFT].type == OPERAND_MEM16_D16 || inst.op[LEFT].type == OPERAND_MEM8_D16) && disp > 0)
-        printf("%d", disp);
+        printf("%hd", disp);
       else if (disp > 0)
-        printf(" + %d", disp);
+        printf(" + %hd", disp);
       else if (disp < 0)
-        printf(" - %d", -disp);
+        printf(" - %hd", -disp);
     }
     printf("]");
   }
   else if (inst.op[LEFT].type == OPERAND_JMP_8)
   {
-    printf("$+2+%d", (i8)inst.op[LEFT].data_lo);
+    printf("$+2+%hd", (i8)inst.op[LEFT].data_lo);
+  }
+  else if (inst.op[LEFT].type == OPERAND_JMP_16)
+  {
+    printf("%hu", ((u16)(ip - memory)) + (((u16)inst.op[LEFT].data_hi) << 8 | ((u16)inst.op[LEFT].data_lo)));
+  }
+  else if (inst.op[LEFT].type == OPERAND_SEG_16)
+  {
+    u16 seg = ((u16)inst.op[LEFT].data_hi) << 8 | ((u16)inst.op[LEFT].data_lo);
+    printf("%hu:", seg);
   }
   else if (isImmed(inst.op[LEFT].type))
   {
     if (has8bitDisp(inst.op[LEFT].type))
     {
       u8 disp = inst.op[LEFT].data_lo;
-      printf("%d", disp);
+      printf("%hd", disp);
     }
     else if (has16bitDisp(inst.op[LEFT].type))
     {
       i16 disp = ((i16)inst.op[LEFT].data_hi) << 8 | ((i16)inst.op[LEFT].data_lo);
-      printf("%d", disp);
+      printf("%hd", disp);
     }
   }
   else if (inst.op[LEFT].type != OPERAND_NONE)
   {
     printf("%s", OPERAND_REG[inst.op[LEFT].type]);
     if (hasDisp(inst.op[LEFT].type))
-      printf(" + %d", inst.op[LEFT].data_lo);
+      printf(" + %hd", inst.op[LEFT].data_lo);
   }
   else
   {
@@ -100,21 +109,21 @@ void print(Instruction inst)
     {
       i8 disp = inst.op[RIGHT].data_lo;
       if ((inst.op[RIGHT].type == OPERAND_MEM16_D8 || inst.op[RIGHT].type == OPERAND_MEM8_D8) && disp > 0)
-        printf("%d", disp);
+        printf("%hd", disp);
       else if (disp > 0)
-        printf(" + %d", disp);
+        printf(" + %hd", disp);
       else if (disp < 0)
-        printf(" - %d", -disp);
+        printf(" - %hd", -disp);
     }
     else if (has16bitDisp(inst.op[RIGHT].type))
     {
       i16 disp = ((i16)inst.op[RIGHT].data_hi) << 8 | ((i16)inst.op[RIGHT].data_lo);
       if ((inst.op[RIGHT].type == OPERAND_MEM16_D16 || inst.op[RIGHT].type == OPERAND_MEM8_D16) && disp > 0)
-        printf("%d", disp);
+        printf("%hd", disp);
       else if (disp > 0)
-        printf(" + %d", disp);
+        printf(" + %hd", disp);
       else if (disp < 0)
-        printf(" - %d", -disp);
+        printf(" - %hd", -disp);
     }
     printf("]");
   }
@@ -122,20 +131,31 @@ void print(Instruction inst)
   {
     if (has8bitDisp(inst.op[RIGHT].type))
     {
-      u8 disp = inst.op[RIGHT].data_lo;
-      printf(", %d", disp);
+      if(operandSize(inst.op[LEFT].type) == 2)
+      {
+        i8 disp = inst.op[RIGHT].data_lo;
+        printf(", %hd", disp);
+      }
+      else
+      {
+        u8 disp = inst.op[RIGHT].data_lo;
+        printf(", %hu", disp);
+      }
     }
     else if (has16bitDisp(inst.op[RIGHT].type))
     {
       i16 disp = ((i16)inst.op[RIGHT].data_hi) << 8 | ((i16)inst.op[RIGHT].data_lo);
-      printf(", %d", disp);
+      if(inst.op[LEFT].type != OPERAND_SEG_16)
+        printf(", %hd", disp);
+      else
+        printf("%hd", disp);       
     }
   }
   else if (inst.op[RIGHT].type != OPERAND_NONE)
   {
     printf(", %s ", OPERAND_REG[inst.op[RIGHT].type]);
     if (hasDisp(inst.op[RIGHT].type))
-      printf(" + %d", inst.op[RIGHT].data_lo);
+      printf(" + %hu", inst.op[RIGHT].data_lo);
   }
   else
   {

@@ -77,9 +77,10 @@
 #define OPERAND_SEG_DS          0x46
 #define OPERAND_SEG_ES          0x47
 #define OPERAND_SEG_SS          0x48
-#define OPERAND_JMP_8           0x49
-#define OPERAND_JMP_16          0x4A
-#define OPERAND_ERROR           0x4B
+#define OPERAND_SEG_16          0x49
+#define OPERAND_JMP_8           0x4A
+#define OPERAND_JMP_16          0x4B
+#define OPERAND_ERROR           0x4C
 
 const uint8_t RM_TABLE[2][8] = 
 {
@@ -293,6 +294,7 @@ uint8_t operandSize(uint8_t operand)
 		case OPERAND_SEG_DS:
 		case OPERAND_SEG_ES:
 		case OPERAND_SEG_SS:
+		case OPERAND_SEG_16:
 		case OPERAND_JMP_16:
 			result = 2;
 		break;
@@ -417,6 +419,7 @@ bool hasDisp(uint8_t operand)
     case OPERAND_MEM16_BX_D16:   
     case OPERAND_JMP_8:
     case OPERAND_JMP_16:
+    case OPERAND_SEG_16:
         result = true;
     }
     return result;
@@ -476,6 +479,7 @@ bool has16bitDisp(uint8_t operand)
     case OPERAND_MEM16_DI_D16:
     case OPERAND_MEM16_BP_D16:
     case OPERAND_MEM16_BX_D16:
+    case OPERAND_SEG_16:
     case OPERAND_JMP_16:
         result = true;
     }
@@ -558,6 +562,7 @@ const char * OPERAND_REG[] =
 "DS",
 "ES",
 "SS",
+"",
 "",
 "",
 "ERROR",
