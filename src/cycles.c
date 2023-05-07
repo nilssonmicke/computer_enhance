@@ -1,3 +1,4 @@
+#include "main.h"
 #include "cycles.h"
 #include "operand.h"
 
@@ -83,19 +84,16 @@ i32 effective_address_cycles(Instruction inst, i32 operator)
 
 i32 transfer_cycles(Instruction *inst, u8 pos, i32 multiplier)
 {
-  if(mode == MODE_8086)
-  {
+  #ifdef MODE_8080
+    if(isMem16(inst->op[pos].type))
+      return 4 * multiplier;
+    return 0;
+  #else 
     i32 address = (i32)((i64)operand(inst, pos) - (i64)memory);
     if((address & 0x1) && isMem16(inst->op[pos].type))
       return 4 * multiplier;
     return 0;
-  }
-  else
-  {
-    if(isMem16(inst->op[pos].type))
-      return 4 * multiplier;
-    return 0;
-  }
+  #endif
 }
 
 

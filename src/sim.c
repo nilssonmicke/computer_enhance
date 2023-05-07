@@ -365,7 +365,12 @@ void exec16(Instruction *inst)
 
 void exec_all(const char *filename)
 {
-  printf("; %s\n", filename);
+  #ifdef MODE_8080
+    printf("; CPU 8080 -- %s\n", filename);
+  #else
+    printf("; CPU 8086 -- %s\n", filename);
+  #endif
+  
   i32 cycles = 0;
   while (ip < ip_end)
   {

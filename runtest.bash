@@ -4,6 +4,7 @@
 CC=gcc
 mkdir -p test
 $CC -g -O3 -Wall -Werror -pedantic -std=c11 src/main.c -o test/sim8086
+$CC -g -O3 -Wall -Werror -pedantic -std=c11 src/main.c -DMODE_8080 -o test/sim8080
 
 test/sim8086 decode perfaware/part1/listing_0037_single_register_mov > test/test_0037.asm
 nasm test/test_0037.asm
@@ -112,11 +113,11 @@ nasm test/test_0056.asm
 diff perfaware/part1/listing_0056_estimating_cycles test/test_0056 || exit 1
 
 #test/sim8086 exec perfaware/part1/listing_0056_estimating_cycles
-#test/sim8086 exec mode_8080 perfaware/part1/listing_0056_estimating_cycles
+#test/sim8080 exec perfaware/part1/listing_0056_estimating_cycles
 
 test/sim8086 decode perfaware/part1/listing_0057_challenge_cycles > test/test_0057.asm
 nasm test/test_0057.asm
 diff perfaware/part1/listing_0057_challenge_cycles test/test_0057 || exit 1
 
-#test/sim8086 exec perfaware/part1/listing_0057_challenge_cycles
-test/sim8086 exec mode_8080 perfaware/part1/listing_0057_challenge_cycles
+test/sim8086 exec perfaware/part1/listing_0057_challenge_cycles
+test/sim8080 exec perfaware/part1/listing_0057_challenge_cycles
