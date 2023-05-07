@@ -7,6 +7,9 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#define MODE_8080 0
+#define MODE_8086 1
+
 #define LEFT  0
 #define RIGHT 1
 
@@ -119,6 +122,7 @@ extern u8 * ip;
 extern u8 * ip_end;
 extern struct registers registers;
 extern u8 flags;
+extern u8 mode;
 
 
 uint8_t read_8();

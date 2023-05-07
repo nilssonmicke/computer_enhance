@@ -3,6 +3,7 @@
 #include "operand.h"
 #include "operator.h"
 #include "print.h"
+#include "cycles.h"
 
 #include <string.h>
 #include <stdio.h>
@@ -66,21 +67,57 @@ void *operand(Instruction *inst, u8 pos)
     return &registers.ds;
   case OPERAND_JMP_8:
     return &inst->op[pos].data_lo;
+  case OPERAND_MEM16_SI:
+    return memory + registers.si;
+  case OPERAND_MEM16_DI:
+    return memory + registers.di;  
+  case OPERAND_MEM16_BX:
+    return memory + registers.bx;
   case OPERAND_MEM16_D16:
     return memory + (((u16)inst->op[pos].data_hi) << 8 | ((u16)inst->op[pos].data_lo));
   case OPERAND_MEM8_BX_D8:
   case OPERAND_MEM16_BX_D8:
     return memory + (registers.bx + (u16)inst->op[pos].data_lo);
   case OPERAND_MEM8_BX_D16:
+  case OPERAND_MEM16_BX_D16:
     return memory + registers.bx + (((u16)inst->op[pos].data_hi) << 8 | ((u16)inst->op[pos].data_lo));
   case OPERAND_MEM16_BP_SI:
     return  memory + (registers.bp + registers.si);
   case OPERAND_MEM8_BP_D8:
   case OPERAND_MEM16_BP_D8:
     return  memory + (registers.bp + (u16)inst->op[pos].data_lo);
+  case OPERAND_MEM8_DI_D16:
+  case OPERAND_MEM16_DI_D16:
+    return memory + registers.di + (((u16)inst->op[pos].data_hi) << 8 | ((u16)inst->op[pos].data_lo)); 
   case OPERAND_MEM8_BP_D16:
+  case OPERAND_MEM16_BP_D16:
     return memory + registers.bp + (((u16)inst->op[pos].data_hi) << 8 | ((u16)inst->op[pos].data_lo));
+  case OPERAND_MEM8_SI_D16:   
+  case OPERAND_MEM16_SI_D16:
+    return memory + registers.si + (((u16)inst->op[pos].data_hi) << 8 | ((u16)inst->op[pos].data_lo));
+  case OPERAND_MEM8_BP_DI: 
+  case OPERAND_MEM16_BP_DI:
+    return memory + registers.bp + registers.di; 
+  case OPERAND_MEM8_BX_SI:
+  case OPERAND_MEM16_BX_SI:
+    return memory + registers.bx + registers.si;
+  case OPERAND_MEM8_BX_DI:
+  case OPERAND_MEM16_BX_DI:
+    return memory + registers.bx + registers.di;
+  case OPERAND_MEM8_BP_DI_D16:
+  case OPERAND_MEM16_BP_DI_D16:
+    return memory + registers.bp + registers.di + (((u16)inst->op[pos].data_hi) << 8 | ((u16)inst->op[pos].data_lo));
+  case OPERAND_MEM8_BX_SI_D16:
+  case OPERAND_MEM16_BX_SI_D16:
+    return memory + registers.bx + registers.si + (((u16)inst->op[pos].data_hi) << 8 | ((u16)inst->op[pos].data_lo));
+  case OPERAND_MEM8_BP_SI_D16:
+  case OPERAND_MEM16_BP_SI_D16:
+    return memory + registers.bp + registers.si + (((u16)inst->op[pos].data_hi) << 8 | ((u16)inst->op[pos].data_lo));
+  case OPERAND_MEM8_BX_DI_D16:
+  case OPERAND_MEM16_BX_DI_D16:
+    return memory + registers.bx + registers.di + (((u16)inst->op[pos].data_hi) << 8 | ((u16)inst->op[pos].data_lo));
   
+    
   }
   printf("Operand unk = '0x%X'\n", inst->op[pos].type);
   exit(-1);
@@ -329,13 +366,15 @@ void exec16(Instruction *inst)
 void exec_all(const char *filename)
 {
   printf("; %s\n", filename);
-
+  i32 cycles = 0;
   while (ip < ip_end)
   {
     prev_ip = ip;
     Instruction inst = decode();
     print(inst);
-    printf("; ");
+    i32 tmp = count_cycles(inst);
+    cycles += tmp;
+    printf("; Clocks: +%d = %d | ", tmp, cycles);
     if(operandSize(inst.op[LEFT].type) == 1)
       exec8(&inst);
     else
@@ -343,18 +382,30 @@ void exec_all(const char *filename)
   }
 
   printf("\nFinal registers:\n");
-  printf("\tAX:0x%hX (%hu)\n", registers.ax, registers.ax);
-  printf("\tBX:0x%hX (%hu)\n", registers.bx, registers.bx);
-  printf("\tCX:0x%hX (%hu)\n", registers.cx, registers.cx);
-  printf("\tDX:0x%hX (%hu)\n", registers.dx, registers.dx);
-  printf("\tSP:0x%hX (%hu)\n", registers.sp, registers.sp);
-  printf("\tBP:0x%hX (%hu)\n", registers.bp, registers.bp);
-  printf("\tSI:0x%hX (%hu)\n", registers.si, registers.si);
-  printf("\tDI:0x%hX (%hu)\n", registers.di, registers.di);
-  printf("\tES:0x%hX (%hu)\n", registers.es, registers.es);
-  printf("\tSS:0x%hX (%hu)\n", registers.ss, registers.ss);
-  printf("\tDS:0x%hX (%hu)\n", registers.ds, registers.ds);
-  printf("\tCS:0x%hX (%hu)\n", registers.cs, registers.cs);
+  if(registers.ax)
+    printf("\tAX:0x%hX (%hu)\n", registers.ax, registers.ax);
+  if(registers.bx)
+    printf("\tBX:0x%hX (%hu)\n", registers.bx, registers.bx);
+  if(registers.cx) 
+    printf("\tCX:0x%hX (%hu)\n", registers.cx, registers.cx);
+  if(registers.dx) 
+    printf("\tDX:0x%hX (%hu)\n", registers.dx, registers.dx);
+  if(registers.sp) 
+    printf("\tSP:0x%hX (%hu)\n", registers.sp, registers.sp);
+  if(registers.bp) 
+    printf("\tBP:0x%hX (%hu)\n", registers.bp, registers.bp);
+  if(registers.si) 
+    printf("\tSI:0x%hX (%hu)\n", registers.si, registers.si);
+  if(registers.di)
+    printf("\tDI:0x%hX (%hu)\n", registers.di, registers.di);
+  if(registers.es)
+    printf("\tES:0x%hX (%hu)\n", registers.es, registers.es);
+  if(registers.ss) 
+    printf("\tSS:0x%hX (%hu)\n", registers.ss, registers.ss);
+  if(registers.ds)
+    printf("\tDS:0x%hX (%hu)\n", registers.ds, registers.ds);
+  if(registers.cs)
+    printf("\tCS:0x%hX (%hu)\n", registers.cs, registers.cs);
   printf("\tIP:0x%hX (%hu)\n", (u16)(ip - memory), (u16)(ip - memory)); 
   printf("\n");  
 }

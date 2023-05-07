@@ -177,7 +177,7 @@ void print_all(const char *filename)
 
 void print_flags(u8 org_flags)
 {
-  if(flags != 0 ||  org_flags != 0)
+  if(flags != org_flags && (flags != 0 ||  org_flags != 0))
   {
     printf("flags:");
     if(org_flags & FLAG_ZERO)

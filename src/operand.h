@@ -150,6 +150,32 @@ bool isImmed(uint8_t operand)
     return result;
 }
 
+bool isReg(uint8_t operand)
+{
+    bool result = false;
+    switch (operand)
+    {
+      case OPERAND_REG_DI:
+      case OPERAND_REG_AL:
+      case OPERAND_REG_CL:
+      case OPERAND_REG_DL:
+      case OPERAND_REG_BL:
+      case OPERAND_REG_AH:
+      case OPERAND_REG_CH:
+      case OPERAND_REG_DH:
+      case OPERAND_REG_BH:
+      case OPERAND_REG_AX:
+      case OPERAND_REG_CX:
+      case OPERAND_REG_DX:
+      case OPERAND_REG_BX:
+      case OPERAND_REG_SP:
+      case OPERAND_REG_BP:
+      case OPERAND_REG_SI:
+        	result = true;
+    }
+    return result;
+}
+
 bool isMem(uint8_t operand)
 {
     bool result = false;

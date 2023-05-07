@@ -33,76 +33,90 @@ test/sim8086 decode perfaware/part1/listing_0043_immediate_movs > test/test_0043
 nasm test/test_0043.asm
 diff perfaware/part1/listing_0043_immediate_movs test/test_0043 || exit 1
 
-test/sim8086 exec perfaware/part1/listing_0043_immediate_movs
+#test/sim8086 exec perfaware/part1/listing_0043_immediate_movs
 
 test/sim8086 decode perfaware/part1/listing_0044_register_movs > test/test_0044.asm
 nasm test/test_0044.asm
 diff perfaware/part1/listing_0044_register_movs test/test_0044 || exit 1
 
-test/sim8086 exec perfaware/part1/listing_0044_register_movs
+#test/sim8086 exec perfaware/part1/listing_0044_register_movs
 
 test/sim8086 decode perfaware/part1/listing_0045_challenge_register_movs > test/test_0045.asm
 nasm test/test_0045.asm
 diff perfaware/part1/listing_0045_challenge_register_movs test/test_0045 || exit 1
 
-test/sim8086 exec perfaware/part1/listing_0045_challenge_register_movs
+#test/sim8086 exec perfaware/part1/listing_0045_challenge_register_movs
 
 test/sim8086 decode perfaware/part1/listing_0046_add_sub_cmp > test/test_0046.asm
 nasm test/test_0046.asm
 diff perfaware/part1/listing_0046_add_sub_cmp test/test_0046 || exit 1
 
-test/sim8086 exec perfaware/part1/listing_0046_add_sub_cmp
+#test/sim8086 exec perfaware/part1/listing_0046_add_sub_cmp
 
 test/sim8086 decode perfaware/part1/listing_0047_challenge_flags > test/test_0047.asm
 nasm test/test_0047.asm
 diff perfaware/part1/listing_0047_challenge_flags test/test_0047 || exit 1
 
-test/sim8086 exec perfaware/part1/listing_0047_challenge_flags
+#test/sim8086 exec perfaware/part1/listing_0047_challenge_flags
 
 test/sim8086 decode perfaware/part1/listing_0048_ip_register > test/test_0048.asm
 nasm test/test_0048.asm
 diff perfaware/part1/listing_0048_ip_register test/test_0048 || exit 1
 
-test/sim8086 exec perfaware/part1/listing_0048_ip_register
+#test/sim8086 exec perfaware/part1/listing_0048_ip_register
 
 test/sim8086 decode perfaware/part1/listing_0049_conditional_jumps > test/test_0049.asm
 nasm test/test_0049.asm
 diff perfaware/part1/listing_0049_conditional_jumps test/test_0049 || exit 1
 
-test/sim8086 exec perfaware/part1/listing_0049_conditional_jumps
+#test/sim8086 exec perfaware/part1/listing_0049_conditional_jumps
 
 test/sim8086 decode perfaware/part1/listing_0050_challenge_jumps > test/test_0050.asm
 nasm test/test_0050.asm
 diff perfaware/part1/listing_0050_challenge_jumps test/test_0050 || exit 1
 
-test/sim8086 exec perfaware/part1/listing_0050_challenge_jumps
+#test/sim8086 exec perfaware/part1/listing_0050_challenge_jumps
 
 test/sim8086 decode perfaware/part1/listing_0051_memory_mov > test/test_0051.asm
 nasm test/test_0051.asm
 diff perfaware/part1/listing_0051_memory_mov test/test_0051 || exit 1
 
-test/sim8086 exec perfaware/part1/listing_0051_memory_mov
+#test/sim8086 exec perfaware/part1/listing_0051_memory_mov
 
 test/sim8086 decode perfaware/part1/listing_0052_memory_add_loop > test/test_0052.asm
 nasm test/test_0052.asm
 diff perfaware/part1/listing_0052_memory_add_loop test/test_0052 || exit 1
 
-test/sim8086 exec perfaware/part1/listing_0052_memory_add_loop
+#test/sim8086 exec perfaware/part1/listing_0052_memory_add_loop
 
 test/sim8086 decode perfaware/part1/listing_0053_add_loop_challenge > test/test_0053.asm
 nasm test/test_0053.asm
 diff perfaware/part1/listing_0053_add_loop_challenge test/test_0053 || exit 1
 
-test/sim8086 exec perfaware/part1/listing_0053_add_loop_challenge
+#test/sim8086 exec perfaware/part1/listing_0053_add_loop_challenge
 
 test/sim8086 decode perfaware/part1/listing_0054_draw_rectangle > test/test_0054.asm
 nasm test/test_0054.asm
 diff perfaware/part1/listing_0054_draw_rectangle test/test_0054 || exit 1
 
-test/sim8086 exec perfaware/part1/listing_0054_draw_rectangle
+#test/sim8086 exec perfaware/part1/listing_0054_draw_rectangle
 
 test/sim8086 decode perfaware/part1/listing_0055_challenge_rectangle > test/test_0055.asm
 nasm test/test_0055.asm
 diff perfaware/part1/listing_0055_challenge_rectangle test/test_0055 || exit 1
 
-test/sim8086 exec dump perfaware/part1/listing_0055_challenge_rectangle
+#test/sim8086 exec dump perfaware/part1/listing_0055_challenge_rectangle
+
+test/sim8086 decode perfaware/part1/listing_0056_estimating_cycles > test/test_0056.asm
+nasm test/test_0056.asm
+diff perfaware/part1/listing_0056_estimating_cycles test/test_0056 || exit 1
+
+#test/sim8086 exec perfaware/part1/listing_0056_estimating_cycles
+#test/sim8086 exec mode_8080 perfaware/part1/listing_0056_estimating_cycles
+
+test/sim8086 decode perfaware/part1/listing_0057_challenge_cycles > test/test_0057.asm
+nasm test/test_0057.asm
+diff perfaware/part1/listing_0057_challenge_cycles test/test_0057 || exit 1
+
+#test/sim8086 exec perfaware/part1/listing_0057_challenge_cycles
+test/sim8086 exec mode_8080 perfaware/part1/listing_0057_challenge_cycles

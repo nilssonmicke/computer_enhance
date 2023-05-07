@@ -4,6 +4,7 @@
 #include "decoder.h"
 #include "print.h"
 #include "sim.h"
+#include "cycles.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -15,6 +16,7 @@ u8 * ip = memory;
 u8 * ip_end = &memory[1024 * 1024];
 struct registers registers = {0};
 u8 flags = 0;
+u8 mode = MODE_8086;
 
 uint8_t read_8()
 {
@@ -45,6 +47,7 @@ bool getParity(u8 n)
 #include "decoder.c"
 #include "print.c"
 #include "sim.c"
+#include "cycles.c"
 
 int main(int argc, char **argv)
 {
@@ -60,6 +63,12 @@ int main(int argc, char **argv)
   const size_t rsize = fread(ip, 1, 1024 * 1024, file);
   ip_end = &ip[rsize];
   fclose(file);
+
+  for(i32 i = 1; i < (argc - 1); i++)
+  {
+    if(strcmp(argv[i], "mode_8080") == 0)
+    	mode = MODE_8080;
+  }
 
   for(i32 i = 1; i < (argc - 1); i++)
   {
