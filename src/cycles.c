@@ -2,6 +2,8 @@
 #include "cycles.h"
 #include "operand.h"
 
+#define CYCLES_BUFFER_COUNT 20
+
 i32 effective_address_cycles(Instruction inst, i32 operator)
 {
   i32 cycles = 0;
@@ -96,10 +98,19 @@ i32 transfer_cycles(Instruction *inst, u8 pos, i32 multiplier)
   #endif
 }
 
+void print_cycles(char *buffer, i32 operation_count, i32 effective_address_count, i32 transfer_count)
+{
+  if(transfer_count)
+    snprintf(buffer, CYCLES_BUFFER_COUNT, "(%d + %dea + %dp)", operation_count, effective_address_count, transfer_count);
+  else
+    snprintf(buffer, CYCLES_BUFFER_COUNT, "(%d + %dea)", operation_count, effective_address_count);    
+} 
 
-i32 count_cycles(Instruction inst)
+void print_count_cycles(Instruction inst, i32 *count)
 {
   i32 cycles = 0;
+  char buffer[CYCLES_BUFFER_COUNT] = {0};
+  
   switch(inst.mnemonic)
   {
     case OPERATOR_MOV:
@@ -110,14 +121,23 @@ i32 count_cycles(Instruction inst)
         else if(isReg(inst.op[RIGHT].type))
           cycles = 2;
         else if(isMem(inst.op[RIGHT].type))
+        {
           cycles = 8 + effective_address_cycles(inst, 1) + transfer_cycles(&inst, RIGHT, 1);
+          print_cycles(buffer, 8, effective_address_cycles(inst, 1), transfer_cycles(&inst, RIGHT, 1));
+        }
       }
       else if(isMem(inst.op[LEFT].type))
       {
         if(isReg(inst.op[RIGHT].type))
+        {
           cycles = 9 + effective_address_cycles(inst, 0) + transfer_cycles(&inst, LEFT, 1);
+          print_cycles(buffer, 9, effective_address_cycles(inst, 0), transfer_cycles(&inst, LEFT, 1));
+        }
         else if(isImmed(inst.op[RIGHT].type))
+        {
           cycles = 10 + effective_address_cycles(inst, 0);
+          print_cycles(buffer, 10, effective_address_cycles(inst, 0), 0);
+        } 
       }
     break;
     case OPERATOR_ADD:
@@ -128,18 +148,27 @@ i32 count_cycles(Instruction inst)
         else if(isImmed(inst.op[RIGHT].type))
           cycles = 4;
         else if(isMem(inst.op[RIGHT].type))
+        {
           cycles = 9 + effective_address_cycles(inst, 1) + transfer_cycles(&inst, RIGHT, 1);
+          print_cycles(buffer, 9, effective_address_cycles(inst, 1), transfer_cycles(&inst, RIGHT, 1));
+        }
       }
       else if(isMem(inst.op[LEFT].type))
       {
         if(isReg(inst.op[RIGHT].type))
-          cycles = 16 + effective_address_cycles(inst, 0)+ transfer_cycles(&inst, LEFT, 2);
+        {
+          cycles = 16 + effective_address_cycles(inst, 0) + transfer_cycles(&inst, LEFT, 2);
+          print_cycles(buffer, 16, effective_address_cycles(inst, 0), transfer_cycles(&inst, LEFT, 2)); 
+        }
         else if(isImmed(inst.op[RIGHT].type))
+        {
           cycles = 17 + effective_address_cycles(inst, 0) + transfer_cycles(&inst, LEFT, 2);
+          print_cycles(buffer, 17, effective_address_cycles(inst, 0), transfer_cycles(&inst, LEFT, 2));
+          
+        }
       }
-
     break;
-      
   }
-  return cycles;
+  *count += cycles;
+  printf("; Clocks: +%d = %d%s | ", cycles, *count, buffer);
 }

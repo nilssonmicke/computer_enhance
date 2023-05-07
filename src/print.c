@@ -175,6 +175,26 @@ void print_all(const char *filename)
   }
 }
 
+void print_flags_state()
+{
+  printf("flags:");
+  if(flags != 0)
+  {
+    if(flags & FLAG_ZERO)
+      printf("Z");
+    if(flags & FLAG_SIGN)
+      printf("S");
+    if(flags & FLAG_OVERFLOW)
+      printf("O");
+    if(flags & FLAG_CARRY)
+      printf("C");
+    if(flags & FLAG_PARITY)
+      printf("P");
+    if(flags & FLAG_AUXILIARY_CARRY)
+      printf("A");
+  }
+}
+
 void print_flags(u8 org_flags)
 {
   if(flags != org_flags && (flags != 0 ||  org_flags != 0))

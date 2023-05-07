@@ -377,9 +377,8 @@ void exec_all(const char *filename)
     prev_ip = ip;
     Instruction inst = decode();
     print(inst);
-    i32 tmp = count_cycles(inst);
-    cycles += tmp;
-    printf("; Clocks: +%d = %d | ", tmp, cycles);
+    print_count_cycles(inst, &cycles);
+
     if(operandSize(inst.op[LEFT].type) == 1)
       exec8(&inst);
     else
@@ -411,6 +410,7 @@ void exec_all(const char *filename)
     printf("\tDS:0x%hX (%hu)\n", registers.ds, registers.ds);
   if(registers.cs)
     printf("\tCS:0x%hX (%hu)\n", registers.cs, registers.cs);
-  printf("\tIP:0x%hX (%hu)\n", (u16)(ip - memory), (u16)(ip - memory)); 
-  printf("\n");  
+  printf("\tIP:0x%hX (%hu)\n    ", (u16)(ip - memory), (u16)(ip - memory)); 
+  print_flags_state(); 
+  printf("\n");
 }

@@ -3,6 +3,6 @@
 
 #include "main.h"
 
-i32 count_cycles(Instruction inst);
+void print_count_cycles(Instruction inst, i32 *count);
 
 #endif
