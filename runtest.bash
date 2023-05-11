@@ -119,5 +119,48 @@ test/sim8086 decode perfaware/part1/listing_0057_challenge_cycles > test/test_00
 nasm test/test_0057.asm
 diff perfaware/part1/listing_0057_challenge_cycles test/test_0057 || exit 1
 
-test/sim8086 exec perfaware/part1/listing_0057_challenge_cycles
-test/sim8080 exec perfaware/part1/listing_0057_challenge_cycles
+#test/sim8086 exec perfaware/part1/listing_0057_challenge_cycles
+#test/sim8080 exec perfaware/part1/listing_0057_challenge_cycles
+
+test/sim8086 decode perfaware/part1/listing_0059_SingleScalar > test/test_0059.asm
+nasm test/test_0059.asm
+diff perfaware/part1/listing_0059_SingleScalar test/test_0059 || exit 1
+
+#test/sim8086 exec perfaware/part1/listing_0059_SingleScalar
+#test/sim8080 exec perfaware/part1/listing_0059_SingleScalar
+
+test/sim8086 decode perfaware/part1/listing_0060_Unroll2Scalar > test/test_0060.asm
+nasm test/test_0060.asm
+diff perfaware/part1/listing_0060_Unroll2Scalar test/test_0060 || exit 1
+
+#test/sim8086 exec perfaware/part1/listing_0060_Unroll2Scalar
+#test/sim8080 exec perfaware/part1/listing_0060_Unroll2Scalar
+
+test/sim8086 decode perfaware/part1/listing_0061_DualScalar > test/test_0061.asm
+nasm test/test_0061.asm
+diff perfaware/part1/listing_0061_DualScalar test/test_0061 || exit 1
+
+#test/sim8086 exec perfaware/part1/listing_0061_DualScalar
+#test/sim8080 exec perfaware/part1/listing_0061_DualScalar
+
+test/sim8086 decode perfaware/part1/listing_0062_QuadScalar > test/test_0062.asm
+nasm test/test_0062.asm
+diff perfaware/part1/listing_0062_QuadScalar test/test_0062 || exit 1
+
+#test/sim8086 exec perfaware/part1/listing_0062_QuadScalar
+#test/sim8080 exec perfaware/part1/listing_0062_QuadScalar
+
+test/sim8086 decode perfaware/part1/listing_0063_QuadScalarPtr > test/test_0063.asm
+nasm test/test_0063.asm
+diff perfaware/part1/listing_0063_QuadScalarPtr test/test_0063 || exit 1
+
+#test/sim8086 exec perfaware/part1/listing_0063_QuadScalarPtr
+#test/sim8080 exec perfaware/part1/listing_0063_QuadScalarPtr
+
+test/sim8086 decode perfaware/part1/listing_0064_TreeScalarPtr > test/test_0064.asm
+nasm test/test_0064.asm
+diff perfaware/part1/listing_0064_TreeScalarPtr test/test_0064 || exit 1
+
+test/sim8086 exec perfaware/part1/listing_0064_TreeScalarPtr
+#test/sim8080 exec perfaware/part1/listing_0064_TreeScalarPtr
+

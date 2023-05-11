@@ -81,11 +81,18 @@ void *operand(Instruction *inst, u8 pos)
   case OPERAND_MEM8_BX_D16:
   case OPERAND_MEM16_BX_D16:
     return memory + registers.bx + (((u16)inst->op[pos].data_hi) << 8 | ((u16)inst->op[pos].data_lo));
+  case OPERAND_MEM8_BP_SI:
   case OPERAND_MEM16_BP_SI:
     return  memory + (registers.bp + registers.si);
   case OPERAND_MEM8_BP_D8:
   case OPERAND_MEM16_BP_D8:
     return  memory + (registers.bp + (u16)inst->op[pos].data_lo);
+  case OPERAND_MEM8_BP_SI_D8:
+  case OPERAND_MEM16_BP_SI_D8:
+      return memory + registers.bp + registers.si + (u16)inst->op[pos].data_lo;
+  case OPERAND_MEM8_BP_DI_D8:
+  case OPERAND_MEM16_BP_DI_D8:
+      return memory + registers.bp + registers.di + (u16)inst->op[pos].data_lo;  
   case OPERAND_MEM8_DI_D16:
   case OPERAND_MEM16_DI_D16:
     return memory + registers.di + (((u16)inst->op[pos].data_hi) << 8 | ((u16)inst->op[pos].data_lo)); 
@@ -97,7 +104,7 @@ void *operand(Instruction *inst, u8 pos)
     return memory + registers.si + (((u16)inst->op[pos].data_hi) << 8 | ((u16)inst->op[pos].data_lo));
   case OPERAND_MEM8_BP_DI: 
   case OPERAND_MEM16_BP_DI:
-    return memory + registers.bp + registers.di; 
+    return memory + registers.bp + registers.di;  
   case OPERAND_MEM8_BX_SI:
   case OPERAND_MEM16_BX_SI:
     return memory + registers.bx + registers.si;
@@ -138,6 +145,9 @@ void exec8(Instruction *inst)
 
   switch (inst->mnemonic)
   {
+    case OPERATOR_RET:
+      ip_end = --ip;
+    break;
     case OPERATOR_MOV:
     {
       if(isMem(inst->op[LEFT].type))
@@ -153,7 +163,7 @@ void exec8(Instruction *inst)
     case OPERATOR_ADD:
     {
       printf("%s(0x%hX)->", OPERAND_REG[inst->op[LEFT].type], org_dest);
-      *dest += *src; 
+      *dest += *src;     
       printf("(0x%hX) ", *dest);
 
       setFlag(*dest == 0, FLAG_ZERO);
@@ -192,6 +202,25 @@ void exec8(Instruction *inst)
       print_flags(org_flags);
       printf("\n");
 
+      break; 
+    }
+    case OPERATOR_TEST:
+    {
+      i8 tmp = *dest - 0;
+      
+      setFlag(tmp == 0, FLAG_ZERO);
+      setFlag(tmp & 0x80, FLAG_SIGN);
+      setFlag(
+        (org_dest < 0 && org_src > 0 && tmp > 0) ||
+        (org_dest > 0 && org_src < 0 && tmp < 0), 
+        FLAG_OVERFLOW
+      );
+      setFlag((u32)org_dest - (u32)org_src > 0xFF, FLAG_CARRY);
+      setFlag(getParity(tmp), FLAG_PARITY);
+      setFlag((u32)(org_dest & 0xF) - (u32)(org_src & 0xF) > 0xF, FLAG_AUXILIARY_CARRY);
+      print_ip();
+      print_flags(org_flags);
+      printf("\n");
       break; 
     }
     case OPERATOR_CMP:
@@ -265,12 +294,15 @@ void exec8(Instruction *inst)
       printf("\n");
       break;
     }
+    default:
+      exit(0);
   }
 }
 
 void exec16(Instruction *inst)
 {
   i16 org_src = 0;
+  i16 org_dest = 0;
 
   if(operandSize(inst->op[RIGHT].type) == 1)
     org_src = *(i8*)operand(inst, RIGHT);
@@ -280,10 +312,15 @@ void exec16(Instruction *inst)
   u8 org_flags = flags;
   i16 * dest = (i16*)operand(inst, LEFT);
   i16 * src = &org_src;
-  i16 org_dest = *(i16*)dest;
+
+  if(dest != NULL)
+    org_dest = *(i16*)dest;
 
   switch (inst->mnemonic)
   {
+    case OPERATOR_RET:
+      ip_end = --ip;
+    break;
     case OPERATOR_MOV:
     {
       if(isMem(inst->op[LEFT].type))
@@ -315,7 +352,48 @@ void exec16(Instruction *inst)
       print_ip();
       print_flags(org_flags);
       printf("\n");
+      break; 
+    }
+    case OPERATOR_INC:
+    {
+      printf("%s(0x%hX)->", OPERAND_REG[inst->op[LEFT].type], org_dest);
+      ++(*dest); 
+      printf("(0x%hX) ", *dest);
 
+      setFlag(*dest == 0, FLAG_ZERO);
+      setFlag(*dest & 0x8000, FLAG_SIGN);
+      setFlag(
+        (org_dest > 0 && org_src > 0 && *dest < 0) ||
+        (org_dest < 0 && org_src < 0 && *dest > 0), 
+        FLAG_OVERFLOW
+      );
+      setFlag((u32)((u16)org_dest + (u16)org_src) > 0xFFFF, FLAG_CARRY);
+      setFlag(getParity(*dest), FLAG_PARITY);
+      setFlag((u32)(org_dest & 0xF) + (u32)(org_src & 0xF) > 0xF, FLAG_AUXILIARY_CARRY);
+      print_ip();
+      print_flags(org_flags);
+      printf("\n");
+      break; 
+    }
+    case OPERATOR_DEC:
+    {
+      printf("%s(0x%hX)->", OPERAND_REG[inst->op[LEFT].type], org_dest);
+      --(*dest); 
+      printf("(0x%hX) ", *dest);
+
+      setFlag(*dest == 0, FLAG_ZERO);
+      setFlag(*dest & 0x8000, FLAG_SIGN);
+      setFlag(
+        (org_dest > 0 && org_src > 0 && *dest < 0) ||
+        (org_dest < 0 && org_src < 0 && *dest > 0), 
+        FLAG_OVERFLOW
+      );
+      setFlag((u32)((u16)org_dest + (u16)org_src) > 0xFFFF, FLAG_CARRY);
+      setFlag(getParity(*dest), FLAG_PARITY);
+      setFlag((u32)(org_dest & 0xF) + (u32)(org_src & 0xF) > 0xF, FLAG_AUXILIARY_CARRY);
+      print_ip();
+      print_flags(org_flags);
+      printf("\n");
       break; 
     }
     case OPERATOR_SUB:
@@ -340,6 +418,25 @@ void exec16(Instruction *inst)
       
       break; 
     }
+    case OPERATOR_TEST:
+    {
+      i16 tmp = *dest - 0;
+      
+      setFlag(tmp == 0, FLAG_ZERO);
+      setFlag(tmp & 0x8000, FLAG_SIGN);
+      setFlag(
+        (org_dest < 0 && org_src > 0 && tmp > 0) ||
+        (org_dest > 0 && org_src < 0 && tmp < 0), 
+        FLAG_OVERFLOW
+      );
+      setFlag((u32)((u16)org_dest - (u16)org_src) > 0xFFFF, FLAG_CARRY);
+      setFlag(getParity(tmp), FLAG_PARITY);
+      setFlag((u32)(org_dest & 0xF) - (u32)(org_src & 0xF) > 0xF, FLAG_AUXILIARY_CARRY);
+      print_ip();
+      print_flags(org_flags);
+      printf("\n");
+      break; 
+    }
     case OPERATOR_CMP:
     {
       i16 tmp = *dest - *src;
@@ -359,6 +456,50 @@ void exec16(Instruction *inst)
       printf("\n");
       break; 
     }
+    case OPERATOR_XOR:
+    {
+      printf("%s(0x%hX)->", OPERAND_REG[inst->op[LEFT].type], org_dest);
+      *dest ^= *src; 
+      printf("(0x%hX) ", *dest);
+
+      setFlag(*dest == 0, FLAG_ZERO);
+      setFlag(*dest & 0x8000, FLAG_SIGN);
+      setFlag(
+        (org_dest > 0 && org_src > 0 && *dest < 0) ||
+        (org_dest < 0 && org_src < 0 && *dest > 0), 
+        FLAG_OVERFLOW
+      );
+      setFlag((u32)((u16)org_dest + (u16)org_src) > 0xFFFF, FLAG_CARRY);
+      setFlag(getParity(*dest), FLAG_PARITY);
+      setFlag((u32)(org_dest & 0xF) + (u32)(org_src & 0xF) > 0xF, FLAG_AUXILIARY_CARRY);
+      print_ip();
+      print_flags(org_flags);
+      printf("\n");
+      break;
+    }
+    case OPERATOR_SHR:
+    {
+      printf("%s(0x%hX)->", OPERAND_REG[inst->op[LEFT].type], org_dest);
+      *dest >>= *src; 
+      printf("(0x%hX) ", *dest);
+
+      setFlag(*dest == 0, FLAG_ZERO);
+      setFlag(*dest & 0x8000, FLAG_SIGN);
+      setFlag(
+        (org_dest > 0 && org_src > 0 && *dest < 0) ||
+        (org_dest < 0 && org_src < 0 && *dest > 0), 
+        FLAG_OVERFLOW
+      );
+      setFlag((u32)((u16)org_dest + (u16)org_src) > 0xFFFF, FLAG_CARRY);
+      setFlag(getParity(*dest), FLAG_PARITY);
+      setFlag((u32)(org_dest & 0xF) + (u32)(org_src & 0xF) > 0xF, FLAG_AUXILIARY_CARRY);
+      print_ip();
+      print_flags(org_flags);
+      printf("\n");
+      break;
+    }
+    default:
+      exit(0);
   }
 }
 

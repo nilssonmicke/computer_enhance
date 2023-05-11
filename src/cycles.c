@@ -1,6 +1,7 @@
 #include "main.h"
 #include "cycles.h"
 #include "operand.h"
+#include "operator.h"
 
 #define CYCLES_BUFFER_COUNT 20
 
@@ -103,7 +104,7 @@ void print_cycles(char *buffer, i32 operation_count, i32 effective_address_count
   if(transfer_count)
     snprintf(buffer, CYCLES_BUFFER_COUNT, "(%d + %dea + %dp)", operation_count, effective_address_count, transfer_count);
   else
-    snprintf(buffer, CYCLES_BUFFER_COUNT, "(%d + %dea)", operation_count, effective_address_count);    
+    snprintf(buffer, CYCLES_BUFFER_COUNT, "(%d + %dea)", operation_count, effective_address_count);
 } 
 
 void print_count_cycles(Instruction inst, i32 *count)
@@ -164,9 +165,44 @@ void print_count_cycles(Instruction inst, i32 *count)
         {
           cycles = 17 + effective_address_cycles(inst, 0) + transfer_cycles(&inst, LEFT, 2);
           print_cycles(buffer, 17, effective_address_cycles(inst, 0), transfer_cycles(&inst, LEFT, 2));
-          
         }
       }
+    break;
+    case OPERATOR_TEST:
+      cycles = 3;
+    break;
+    case OPERATOR_JE:
+      cycles = 4;
+    break;
+    case OPERATOR_XOR:
+      cycles = 3;
+    break;
+    case OPERATOR_INC:
+      cycles = 2;
+    break;
+    case OPERATOR_JNE:
+      if(!(flags & FLAG_ZERO))
+        cycles = 16;
+      else 
+        cycles = 4;
+    break;
+    case OPERATOR_JB:
+      if(flags & FLAG_CARRY)
+        cycles = 16;
+      else 
+        cycles = 4;
+    break;
+    case OPERATOR_CMP:
+      if(isReg(inst.op[RIGHT].type))
+        cycles = 3;
+      else if(isImmed(inst.op[RIGHT].type))
+        cycles = 4;
+    break;
+    case OPERATOR_SHR:
+      cycles = 2;
+    break;
+    case OPERATOR_DEC:
+      cycles = 2;
     break;
   }
   *count += cycles;
